@@ -1,0 +1,25 @@
+name: Build and push Docker image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: indexer-health
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: docker.pkg.github.com/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}

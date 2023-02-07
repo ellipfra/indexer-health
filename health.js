@@ -7,13 +7,13 @@ const Prometheus = require('prom-client');
 
 dotenv.config();
 
-const N = parseInt(process.env.BLOCK_NUMBER_DELTA) || 100;
-const M = parseInt(process.env.RESPONSE_TIME) || 500;
+const N = parseInt(process.env.BLOCKS_BEHIND_THRESHOLD) || 100;
+const M = parseInt(process.env.RESPONSE_TIME_THRESHOLD) || 500;
 const pollInterval = parseInt(process.env.POLL_INTERVAL) || 10000; // 10 seconds
 const indexerServiceUrl = process.env.INDEXER_SERVICE_URL || "https://api.thegraph.com/";
 const subgraphDeployment = process.env.SUBGRAPH_DEPL || "QmV614UpBCpuusv5MsismmPYu4KqLtdeNMKpiNrX56kw6u";
 const subgraphHost = process.env.SUBGRAPH_HOST || "api.thegraph.com";
-const infuraUrl = process.env.INFURA_URL || "https://mainnet.infura.io/v3/your-infura-project-id";
+const rpcURL = process.env.RPC_URL || "https://mainnet.infura.io/v3/your-infura-project-id";
 const bearerToken = process.env.BEARER_TOKEN;
 let healthStatus = "unknown";
 
@@ -42,7 +42,7 @@ const checkHealth = async () => {
         const responseTime = Date.now() - startTime;
 
         const subgraphBlockNumber = JSON.parse(subgraphResponse.data.graphQLResponse).data._meta.block.number;
-        const { data: infuraBlockNumberResponse } = await axios.post(infuraUrl, {
+        const { data: infuraBlockNumberResponse } = await axios.post(rpcURL, {
             jsonrpc: "2.0",
             id: 1,
             method: "eth_blockNumber",

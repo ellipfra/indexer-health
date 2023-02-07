@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: indexer-health
+  IMAGE_NAME: ellipfra/indexer-health
   REGISTRY: ghcr.io
   IMAGE_TAG: ${{ github.sha }}
 

@@ -26,9 +26,21 @@ let healthStatuses = {};
 // Prometheus metrics
 // Create a Registry which registers the metrics
 const register = new Prometheus.Registry()
-const deltaMetric = new Prometheus.Gauge({ name: 'block_number_delta', help: 'Block number delta between Infura and The Graph' });
-const responseTimeMetric = new Prometheus.Gauge({ name: 'response_time', help: 'Response time in milliseconds' });
-const errorRateMetric = new Prometheus.Gauge({ name: 'error_rate', help: 'Average error rate for the past Y queries' });
+const deltaMetric = new Prometheus.Gauge({
+    name: 'block_number_delta',
+    help: 'Block number delta between Infura and The Graph',
+    labelNames: ['chain'],
+});
+const responseTimeMetric = new Prometheus.Gauge({
+    name: 'response_time',
+    help: 'Response time in milliseconds',
+    labelNames: ['chain'],
+});
+const errorRateMetric = new Prometheus.Gauge({
+    name: 'error_rate',
+    help: 'Average error rate for the past Y queries',
+    labelNames: ['chain'],
+});
 
 register.registerMetric(deltaMetric);
 register.registerMetric(responseTimeMetric);
@@ -79,8 +91,8 @@ const checkHealth = async (config, errorRates) => {
             errorRates.shift();
         }
 
-        deltaMetric.set(delta);
-        responseTimeMetric.set(responseTime);
+        deltaMetric.labels(config.name).set(delta);
+        responseTimeMetric.labels(config.name).set(responseTime);
 
     } catch (error) {
         console.error(`[${config.name}]`, error);
@@ -88,8 +100,8 @@ const checkHealth = async (config, errorRates) => {
         if (errorRates.length > config.Y) {
             errorRates.shift();
         }
-        deltaMetric.set(-1);
-        responseTimeMetric.set(-1);
+        deltaMetric.labels(config.name).set(-1);
+        responseTimeMetric.labels(config.name).set(-1);
 
     } finally {
         const averageErrorRate = calculateAverageErrorRate(errorRates);
@@ -100,7 +112,7 @@ const checkHealth = async (config, errorRates) => {
         } else {
             healthStatus = "healthy";
         }
-        errorRateMetric.set(averageErrorRate * 100);
+        errorRateMetric.labels(config.name).set(averageErrorRate * 100);
     }
     return healthStatus;
 };

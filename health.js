@@ -78,7 +78,8 @@ const checkHealth = async (config, errorRates) => {
             params: []
         });
         const infuraBlockNumber = parseInt(infuraBlockNumberResponse.result,16);
-        const delta = Math.abs(parseInt(subgraphBlockNumber) - infuraBlockNumber);
+        const trueDelta = parseInt(subgraphBlockNumber) - infuraBlockNumber;
+        const delta = trueDelta <= 0 ? Math.abs(trueDelta) : 0;
 
         console.log(`[${config.name}] Subgraph block number: ${subgraphBlockNumber}, Infura block number: ${infuraBlockNumber}, Delta: ${delta}, Response time: ${responseTime}ms`);
 
